@@ -26,8 +26,33 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 //MONGO DB FUNCTION
 async function mongoDbRun() {
     try {
+        //ALL COLLECTIONS
         const productCollection = client.db("reMart").collection("products");
         const productCategory = client.db("reMart").collection("productCategory");
+        const booked = client.db("reMart").collection("booked");
+        //JWT-
+        app.post("/jwt", (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+            res.send({ token })
+        })
+        //VERIFY JWT FUCTION
+        function verifyJwt(req, res, next) {
+
+            const authHeader = req.headers.authorization;
+            console.log(authHeader)
+            if (!authHeader) {
+                res.status(401).send({ message: "unauthorized" })
+            }
+            const token = authHeader;
+            jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+                if (err) {
+                    res.status(403).send({ message: "unauthorized" })
+                }
+                req.decoded = decoded;
+                next();
+            })
+        }
 
         //read all products Categories data
         app.get("/categories", async (req, res) => {
@@ -44,15 +69,13 @@ async function mongoDbRun() {
             const reviews = await cursor.toArray();
             res.send(reviews);
         });
+        app.post("/booked", async (req, res) => {
+            const data = req.body;
+            const reviews = await booked.insertOne(data);
+            res.send(reviews);
+        });
 
 
-        //JWT-
-        app.post("/jwt", (req, res) => {
-            const user = req.body;
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
-            res.send({ token })
-        })
-        //VERIFY JWT FUCTION
 
 
     } finally { }
