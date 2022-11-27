@@ -19,6 +19,17 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 
+
+/***
+         * API Naming Convention 
+         * app.get('/booked')
+         * app.get('/booked/:id')
+         * app.post('/booked')
+         * app.patch('/booked/:id')
+         * app.delete('/booked/:id')
+        */
+
+
 //MONGO DB API
 const uri = `mongodb+srv://${process.env.DB_USER_NAME}:${process.env.BD_USER_PASSWORD}@cluster0.4fdxwm9.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -30,6 +41,7 @@ async function mongoDbRun() {
         const productCollection = client.db("reMart").collection("products");
         const productCategory = client.db("reMart").collection("productCategory");
         const booked = client.db("reMart").collection("booked");
+        const usersCollection = client.db("reMart").collection("users");
         //JWT-
         app.post("/jwt", (req, res) => {
             const user = req.body;
@@ -69,13 +81,29 @@ async function mongoDbRun() {
             const reviews = await cursor.toArray();
             res.send(reviews);
         });
+        //save product booked information
         app.post("/booked", async (req, res) => {
             const data = req.body;
             const reviews = await booked.insertOne(data);
             res.send(reviews);
         });
-
-
+        //save user information
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
+        })
+        //jwt for google sign in method
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            if (user) {
+                const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+                return res.send({ token })
+            }
+            res.status(403).send({ toekn: "" })
+        })
 
 
     } finally { }
