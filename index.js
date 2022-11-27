@@ -81,6 +81,14 @@ async function mongoDbRun() {
             const reviews = await cursor.toArray();
             res.send(reviews);
         });
+        //get product DATA by seller email;
+        app.get("/myproducts", async (req, res) => {
+            const email = req.query.email;
+            const query = { seller_email: email }
+            const product = productCollection.find(query);
+            const result = await product.toArray();
+            res.send(result);
+        });
         //save product booked information
         app.post("/booked", async (req, res) => {
             const data = req.body;
