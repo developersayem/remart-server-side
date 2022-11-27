@@ -29,7 +29,6 @@ app.get('/', (req, res) => {
          * app.delete('/booked/:id')
         */
 
-
 //MONGO DB API
 const uri = `mongodb+srv://${process.env.DB_USER_NAME}:${process.env.BD_USER_PASSWORD}@cluster0.4fdxwm9.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -101,12 +100,24 @@ async function mongoDbRun() {
             const result = await usersCollection.insertOne(user);
             res.send(result);
         })
-        //add product user information
+        //add user product  information
         app.post('/product', async (req, res) => {
             const product = req.body;
             const result = await productCollection.insertOne(product);
             res.send(result);
         })
+        // delet my product product (D)
+        app.delete("/myproduct/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(query);
+            res.send(result);
+        });
+
+
+
+
+
         //jwt for google sign in method
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
