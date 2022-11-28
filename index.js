@@ -102,6 +102,13 @@ async function mongoDbRun() {
             const result = await product.toArray();
             res.send(result);
         });
+        // delete user data form user collections
+        app.delete("/user/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result);
+        });
         //save product booked information
         app.post("/booked", async (req, res) => {
             const data = req.body;
@@ -146,6 +153,34 @@ async function mongoDbRun() {
             res.send(result);
         });
 
+        //add my product advertised : option(U)
+        app.put("/myproduct/advertised/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const data = req.body;
+            const option = { upinsert: true };
+            const updatedUser = {
+                $set: {
+                    advertised: data.advertised,
+                },
+            };
+            const result = await productCollection.updateOne(
+                filter,
+                updatedUser,
+                option
+            );
+            res.send(result);
+        });
+
+
+        //get all produt  DATA Advertised prop and value option;
+        app.get("/product/advertised", async (req, res) => {
+            const query = { advertised: "Advertised" }
+            const product = productCollection.find(query);
+            const products = await product.toArray();
+            const result = products.filter(pro => pro.status == "unsold");
+            res.send(result);
+        });
 
 
 
