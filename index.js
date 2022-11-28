@@ -117,9 +117,18 @@ async function mongoDbRun() {
         });
         //save user information
         app.post('/users', async (req, res) => {
-            const user = req.body;
-            const result = await usersCollection.insertOne(user);
-            return res.send(result)
+            const data = req.body;
+            const User = await usersCollection.insertOne(user);
+
+            // Check if this user already exisits
+            let user = await User.findOne({ email: req.body.email });
+            if (user) {
+                return res.status(400).send([]);
+            } else {
+                // Insert the new user if they do not exist yet
+                user = await usersCollection.insertOne(data);
+                res.send(user);
+            }
         })
         //add user product  information
         app.post('/product', async (req, res) => {
