@@ -89,14 +89,14 @@ async function mongoDbRun() {
             res.send(result);
         });
         //get all seller DATA by seller role: seler option;
-        app.get("/allseller", async (req, res) => {
+        app.get("/allseller", verifyJwt, async (req, res) => {
             const query = { role: "seller" }
             const product = usersCollection.find(query);
             const result = await product.toArray();
             res.send(result);
         });
         //get all byer DATA by  buyer role: buyer option;
-        app.get("/allbuyer", async (req, res) => {
+        app.get("/allbuyer", verifyJwt, async (req, res) => {
             const query = { role: "buyer" }
             const product = usersCollection.find(query);
             const result = await product.toArray();
@@ -154,7 +154,7 @@ async function mongoDbRun() {
         });
 
         //add my product advertised : option(U)
-        app.put("/myproduct/advertised/:id", async (req, res) => {
+        app.put("/myproduct/advertised/:id", verifyJwt, async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const data = req.body;
@@ -182,6 +182,22 @@ async function mongoDbRun() {
             res.send(result);
         });
 
+        //read all user  data user email;
+        app.get("/mongousers", verifyJwt, async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const result = await usersCollection.findOne(query);
+            res.send(result);
+        });
+
+        //get booked product DATA by user email;
+        app.get("/myorders", verifyJwt, async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email }
+            const product = booked.find(query);
+            const result = await product.toArray();
+            res.send(result);
+        });
 
 
 
