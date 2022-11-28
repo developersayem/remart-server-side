@@ -88,6 +88,20 @@ async function mongoDbRun() {
             const result = await product.toArray();
             res.send(result);
         });
+        //get all seller DATA by seller role: seler option;
+        app.get("/allseller", async (req, res) => {
+            const query = { role: "seller" }
+            const product = usersCollection.find(query);
+            const result = await product.toArray();
+            res.send(result);
+        });
+        //get all byer DATA by  buyer role: buyer option;
+        app.get("/allbuyer", async (req, res) => {
+            const query = { role: "buyer" }
+            const product = usersCollection.find(query);
+            const result = await product.toArray();
+            res.send(result);
+        });
         //save product booked information
         app.post("/booked", async (req, res) => {
             const data = req.body;
@@ -106,11 +120,29 @@ async function mongoDbRun() {
             const result = await productCollection.insertOne(product);
             res.send(result);
         })
-        // delet my product product (D)
+        // delete my product (D)
         app.delete("/myproduct/:id", async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const result = await productCollection.deleteOne(query);
+            res.send(result);
+        });
+        //UPDATE my product status option(U)
+        app.put("/myproduct/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const data = req.body;
+            const option = { upinsert: true };
+            const updatedUser = {
+                $set: {
+                    status: data.status,
+                },
+            };
+            const result = await productCollection.updateOne(
+                filter,
+                updatedUser,
+                option
+            );
             res.send(result);
         });
 
