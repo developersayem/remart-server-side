@@ -119,7 +119,7 @@ async function mongoDbRun() {
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
-            res.send(result);
+            return res.send(result)
         })
         //add user product  information
         app.post('/product', async (req, res) => {
@@ -154,7 +154,7 @@ async function mongoDbRun() {
         });
 
         //add my product advertised : option(U)
-        app.put("/myproduct/advertised/:id", verifyJwt, async (req, res) => {
+        app.put("/myproduct/advertised/:id", async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const data = req.body;
@@ -191,7 +191,7 @@ async function mongoDbRun() {
         });
 
         //get booked product DATA by user email;
-        app.get("/myorders", verifyJwt, async (req, res) => {
+        app.get("/myorders", async (req, res) => {
             const email = req.query.email;
             const query = { email: email }
             const product = booked.find(query);
