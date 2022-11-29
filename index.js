@@ -192,7 +192,7 @@ async function mongoDbRun() {
         });
 
         //read all user  data user email;
-        app.get("/mongousers", verifyJwt, async (req, res) => {
+        app.get("/mongousers", async (req, res) => {
             const email = req.query.email;
             const query = { email: email };
             const result = await usersCollection.findOne(query);
